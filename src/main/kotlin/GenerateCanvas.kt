@@ -8,33 +8,51 @@ class GenerateCanvas {
             fun generateScript() {
                 val jsFile = File("script.js")
                 jsFile.writeText(
-                    "const randomInRange = (min, max) => Math.floor(Math.random() * (max - min)) + min;" +
+                    "const randInRange = (min, max) => Math.floor(Math.random() * (max - min)) + min; \n" +
                             "function drawRadar(ringsNum, techAmount) {\n" +
-                            "c = document.getElementById(\"radar\");\n" +
-                            "ctx = c.getContext(\"2d\");\n" +
+                            "var point_size = 5;\n" +
+                            "var c = document.getElementById(\"radar\");\n" +
+                            "var ctx = c.getContext('2d');\n" +
+
+                            "function drawCoordSys(ringsNum, ringSize, dash) {\n" +
                             "ctx.beginPath();\n" +
-                            "ctx.setLineDash([5, 5]);\n" +
-                            "ctx.moveTo(ringsNum*100, 0);\n" +
-                            "ctx.lineTo(ringsNum*100, ringsNum*100*2);\n" +
+                            "ctx.setLineDash([dash, dash]);\n" +
+                            "ctx.moveTo(ringsNum*ringSize, 0);\n" +
+                            "ctx.lineTo(ringsNum*ringSize, ringsNum*ringSize*2);\n" +
                             "ctx.stroke();\n" +
                             "ctx.beginPath();\n" +
-                            "ctx.moveTo(0, ringsNum*100);\n" +
-                            "ctx.lineTo(ringsNum*100*2, ringsNum*100);\n" +
+                            "ctx.moveTo(0, ringsNum*ringSize);\n" +
+                            "ctx.lineTo(ringsNum*ringSize*2, ringsNum*ringSize);\n" +
                             "ctx.stroke();\n" +
                             "ctx.setLineDash([0, 0]);\n" +
-                            "for(i=1; i<=ringsNum; i++) {\n" +
+                            "}\n" +
+
+                            "function drawCircle(center_x, center_y, radius) {\n" +
                             "ctx.beginPath();\n" +
-                            "ctx.arc(ringsNum*100, ringsNum*100, 100*i, 0, 2*Math.PI);\n" +
+                            "ctx.arc(center_x, center_y, radius, 0, 2*Math.PI);\n" +
                             "ctx.stroke();\n" +
                             "}\n" +
-                            "ctx.fillStyle = 'blue';\n" +
-                            "for(i=1; i<=techAmount; i++) {\n" +
-                            "r = ringsNum*100 * Math.sqrt(Math.random())\n" +
-                            "theta = Math.random()*2*Math.PI\n" +
-                            "x = ringsNum*100 + r * Math.cos(theta)\n" +
-                            "y = ringsNum*100 + r * Math.sin(theta)\n" +
-                            "ctx.fillRect(x, y, 10,10);\n" +
+
+                            "function drawPoint(center_x, center_y, angle, radius, ringNum, ringSize, label) {\n" +
+                            "ctx.fillStyle = 'black'; \n" +
+                            "var x = center_x + (radius+ringNum*ringSize) * Math.cos(-angle*Math.PI/180);\n" +
+                            "var y = center_y + (radius+ringNum*ringSize) * Math.sin(-angle*Math.PI/180);\n" +
+
+                            "ctx.beginPath();\n" +
+                            "ctx.arc(x, y, point_size, 0, 2 * Math.PI);\n" +
+                            "ctx.fill();\n" +
+                            "ctx.font = 'bold 5px arial';\n" +
+                            "ctx.fillStyle = 'white'; \n" +
+                            "ctx.fillText(label,x,y);\n" +
                             "}\n" +
+
+                            "drawCoordSys(ringsNum, 100, 5) \n" +
+                            "for(i=1; i<=ringsNum; i++) { \n" +
+                            "drawCircle(ringsNum*100, ringsNum*100, i*100);\n" +
+                            "}\n" +
+                            "for(i=1; i<=techAmount; i++) { \n" +
+                            "drawPoint(ringsNum*100, ringsNum*100, randInRange(0, 360), randInRange(0, 100), randInRange(0, 4), 100, i);\n" +
+                            "}" +
                             "}"
                 )
             }
@@ -48,7 +66,7 @@ class GenerateCanvas {
                             "<meta charset=\"utf-8\">\n" +
                             "<script src=\"script.js\"></script>\n" +
                             "</head>\n" +
-                            "<body onload=\"drawRadar(" +ringsNum+ "," +techAmount+ ")\">\n" +
+                            "<body onload=\"drawRadar("+ringsNum+","+techAmount+")\">\n" +
                             "<canvas id=\"radar\", width="+ ringsNum*250 +", height="+ ringsNum*250 +">\n" +
                             "</canvas>\n" +
                             "</body>\n" +
